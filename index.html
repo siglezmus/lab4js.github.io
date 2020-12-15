@@ -12,7 +12,7 @@
     var renderer = new THREE.WebGLRenderer({
         alpha: true
     });
-    renderer.setClearColor(new THREE.Color('blue'), 0)
+    renderer.setClearColor(new THREE.Color(0xFF2D00), 1)
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.domElement.style.position = 'absolute'
     renderer.domElement.style.top = '0px'
@@ -122,7 +122,7 @@
             opacity: 0.9
         } )
     );
-    sphere_fig.position.y = 0.5
+    sphere_fig.position.y = 0.1
     arWorldRoot.add(sphere_fig);
 
     onRenderFcts.push(function () {
