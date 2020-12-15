@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+<script src='lib/three.min.js'></script>
+<script src="lib/ar.js"></script>
+<!--<script>THREEx.ArToolkitContext.baseURL = ''</script>-->
+
+<body style='margin : 0; overflow: hidden; font-family: Monospace;'>
+
+<script>
+
+
+    var renderer = new THREE.WebGLRenderer({
+        alpha: true
+    });
+    renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.domElement.style.position = 'absolute'
+    renderer.domElement.style.top = '0px'
+    renderer.domElement.style.left = '0px'
+    document.body.appendChild(renderer.domElement);
+
+    var onRenderFcts = [];
+
+    var scene = new THREE.Scene();
+
+    var camera = new THREE.Camera();
+    scene.add(camera);
+
+
+    var arToolkitSource = new THREEx.ArToolkitSource({
+        sourceType: 'webcam',
+
+    })
+
+    arToolkitSource.init(function onReady() {
+        onResize()
+    })
+
+    // handle resize
+    window.addEventListener('resize', function () {
+        onResize()
+    })
+
+
+    function onResize() {
+        arToolkitSource.onResizeElement()
+        arToolkitSource.copyElementSizeTo(renderer.domElement)
+        if (arToolkitContext.arController !== null) {
+            arToolkitSource.copyElementSizeTo(arToolkitContext.arController.canvas)
+        }
+    }
+
+
+    
+    var arToolkitContext = new THREEx.ArToolkitContext({
+        
+        cameraParametersUrl: 'par/params.dat',
+        detectionMode: 'mono',
+        maxDetectionRate: 30,
+        canvasWidth: 80 * 3,
+        canvasHeight: 60 * 3,
+    })
+
+    arToolkitContext.init(function onCompleted() {
+        camera.projectionMatrix.copy(arToolkitContext.getProjectionMatrix());
+    })
+
+    onRenderFcts.push(function () {
+        if (arToolkitSource.ready === false) return
+
+        arToolkitContext.update(arToolkitSource.domElement)
+    })
+
+
+
+    var markerRoot = new THREE.Group
+    scene.add(markerRoot)
+    var artoolkitMarker = new THREEx.ArMarkerControls(arToolkitContext, markerRoot, {
+        type: 'pattern',
+        patternUrl: 'patt/custom.patt'
+    })
+
+    var smoothedRoot = new THREE.Group()
+    scene.add(smoothedRoot)
+    var smoothedControls = new THREEx.ArSmoothedControls(smoothedRoot, {
+        lerpPosition: 0.4,
+        lerpQuaternion: 0.3,
+        lerpScale: 1,
+    })
+    onRenderFcts.push(function (delta) {
+        smoothedControls.update(markerRoot)
+    })
+
+    var arWorldRoot = smoothedRoot
+	
+	var sphere = function( u, v, target) {
+        //u ~ fi
+        u = 2*Math.PI*u;
+		v = Math.PI*v;
+		
+		a = 0.24;
+	    R = 1.0;
+        n = 6.0;
+		
+		x = ((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.cos(u));
+		y = ((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.sin(u));
+		z = (R * Math.sin( v ));
+
+		target.set( x, y, z );
+    };
+
+
+    var sphere_fig = new THREE.Mesh(
+        new THREE.ParametricGeometry(sphere, 120, 120, false),
+        new THREE.MeshPhongMaterial( {
+            polygonOffset: true,  
+            polygonOffsetUnits: 1,
+            polygonOffsetFactor: 1,
+            color: "white",
+            specular: 0x202020,
+            transparent: true,
+            opacity: 0.9
+        } )
+    );
+    sphere_fig.position.y = 0.5
+    arWorldRoot.add(sphere_fig);
+
+    onRenderFcts.push(function () {
+        sphere_fig.rotation.x += 0.1
+    })
+
+
+    onRenderFcts.push(function () {
+        renderer.render(scene, camera);
+
+    })
+
+
+    var lastTimeMsec = null
+    requestAnimationFrame(function animate(nowMsec) {
+        requestAnimationFrame(animate);
+        lastTimeMsec = lastTimeMsec || nowMsec - 1000 / 60
+        var deltaMsec = Math.min(200, nowMsec - lastTimeMsec)
+        lastTimeMsec = nowMsec
+        onRenderFcts.forEach(function (onRenderFct) {
+            onRenderFct(deltaMsec / 1000, nowMsec / 1000)
+        })
+    })
+</script>
+</body>
