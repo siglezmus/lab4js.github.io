@@ -12,7 +12,7 @@
     var renderer = new THREE.WebGLRenderer({
         alpha: true
     });
-    renderer.setClearColor(new THREE.Color('lightgrey'), 0)
+    renderer.setClearColor(new THREE.Color('blue'), 0)
     renderer.setSize(window.innerWidth, window.innerHeight);
     renderer.domElement.style.position = 'absolute'
     renderer.domElement.style.top = '0px'
@@ -126,7 +126,7 @@
     arWorldRoot.add(sphere_fig);
 
     onRenderFcts.push(function () {
-        sphere_fig.rotation.y += 0.05
+        sphere_fig.rotation.y += 0.1
     })
 
 
