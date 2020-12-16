@@ -105,9 +105,9 @@
 	    R = 1.0;
         n = 6.0;
 		
-		x = ((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.cos(u));
-		y = ((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.sin(u));
-		z = (R * Math.sin( v ));
+		x = 0.75 * ((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.cos(u));
+		y = 0.75 *((R * Math.cos(v) + a*(1 - Math.sin(v)) * Math.abs(Math.cos(n*u))) * Math.sin(u));
+		z = 0.75 *(R * Math.sin( v ));
 
 		target.set( x, y, z );
     };
