@@ -126,7 +126,9 @@
         } )
     );
     sphere_fig.position.y = 0.1
-    sphere_fig.rotation.x += 0.5
+    //sphere_fig.rotateX(THREE.Math.degToRad(degreeX));
+    sphere_fig.rotateY(THREE.Math.degToRad(90));
+    //sphere_fig.rotateZ(THREE.Math.degToRad(degreeZ));
     arWorldRoot.add(sphere_fig);
 
     onRenderFcts.push(function () {
